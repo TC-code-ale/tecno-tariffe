@@ -76,12 +76,12 @@
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
         }
         
         td:last-child {
             text-align: right;
             font-weight: 600;
-            vertical-align: middle;
         }
 
         th {
@@ -171,7 +171,13 @@
         .card h3 { margin-top: 0; color: var(--primary-color); }
         .card ul { padding-left: 0; list-style: none; }
         .card li { margin-bottom: 10px; display: flex; justify-content: space-between; }
-        .card li span:last-child { font-weight: 600; }
+        
+        /* *** SOLUZIONE PER GLI ESEMPI PRATICI *** */
+        .card li span:last-child { 
+            font-weight: 600;
+            white-space: nowrap; /* Impedisce al prezzo di andare a capo */
+        }
+        
         .total-line { font-weight: 700; color: var(--primary-color); border-top: 2px solid var(--dark-grey); padding-top: 10px; margin-top: 10px; }
 
         /* --- STILE CALCOLATORE --- */
@@ -193,26 +199,23 @@
         
         /* --- RESPONSIVE DESIGN --- */
         @media (max-width: 800px) {
-            h1 {
-                font-size: 2rem;
-            }
-            .container {
-                padding: 10px;
-            }
-            section {
-                padding: 20px 15px;
-            }
-            /* Layout a colonna singola per i contenitori principali */
-            .grid-container-calculator,
-            .contracts-container {
-                grid-template-columns: 1fr;
-            }
-            .contract-card.premium {
-                transform: none; /* Rimuove l'effetto zoom su mobile */
-            }
-             #total-amount {
-                font-size: 2.2rem;
-            }
+            h1 { font-size: 2rem; }
+            .container { padding: 10px; }
+            section { padding: 20px 15px; }
+            .grid-container-calculator, .contracts-container { grid-template-columns: 1fr; }
+            .contract-card.premium { transform: none; }
+            #total-amount { font-size: 2.2rem; }
+
+            /* --- STILI RESPONSIVE PER LA TABELLA FLUSSO OPERATIVO --- */
+            #flusso table, #flusso thead, #flusso tbody, #flusso th, #flusso td, #flusso tr { display: block; }
+            #flusso thead tr { position: absolute; top: -9999px; left: -9999px; }
+            #flusso tr { border: 1px solid var(--border-color); margin-bottom: 1rem; border-radius: 5px; }
+            #flusso td { border: none; border-bottom: 1px solid #eee; position: relative; padding-left: 45%; text-align: right; }
+            #flusso td:before { position: absolute; top: 50%; transform: translateY(-50%); left: 15px; width: 40%; padding-right: 10px; white-space: nowrap; text-align: left; font-weight: 700; color: var(--primary-color; }
+            #flusso td:nth-of-type(1):before { content: "Fase"; }
+            #flusso td:nth-of-type(2):before { content: "Attività"; }
+            #flusso td:nth-of-type(3):before { content: "Dettagli"; }
+            #flusso td:first-child { font-weight: 400; }
         }
     </style>
 </head>
@@ -328,7 +331,7 @@
                 <table><tbody><tr><td>Registrazione intervento su portale F-GAS</td><td>25,00 €</td></tr><tr><td>Ritiro in officina per preventivazione</td><td>80,00 €</td></tr><tr><td>Materiale di consumo</td><td>Addebito minimo 10,00 € o al costo</td></tr><tr><td>Pedaggi e Parcheggi</td><td>Al costo</td></tr></tbody></table>
 
                 <h3>Tariffe a Forfait - Mondo Caffè</h3>
-                <table><tbody><tbody><tr><td>Ritiro fino a nr. 2 apparecchi</td><td>160,00 €</td></tr><tr><td>Installazione macchina + macinacaffè + depuratore</td><td>250,00 €</td></tr><tr><td>Manutenzione ordinaria 2 Gruppi (docce, filtri, sottocoppe)</td><td>85,00 €</td></tr><tr><td>Manutenzione ordinaria 3 Gruppi (docce, filtri, sottocoppe)</td><td>95,00 €</td></tr><tr><td>Sostituzione cartuccia Brita C300</td><td>140,00 €</td></tr></tbody></table>
+                <table><tbody><tr><td>Ritiro fino a nr. 2 apparecchi</td><td>160,00 €</td></tr><tr><td>Installazione macchina + macinacaffè + depuratore</td><td>250,00 €</td></tr><tr><td>Manutenzione ordinaria 2 Gruppi (docce, filtri, sottocoppe)</td><td>85,00 €</td></tr><tr><td>Manutenzione ordinaria 3 Gruppi (docce, filtri, sottocoppe)</td><td>95,00 €</td></tr><tr><td>Sostituzione cartuccia Brita C300</td><td>140,00 €</td></tr></tbody></table>
             </section>
         </main>
 
@@ -423,4 +426,4 @@
     </script>
 
 </body>
-</html>
+</html>```
