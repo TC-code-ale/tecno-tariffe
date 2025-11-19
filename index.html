@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procedura Calcolo Interventi - TECNO CLINIC SRL</title>
+    <style>
+        /* --- FONT E STILI GLOBALI --- */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        :root {
+            --primary-color: #005A9C;
+            --secondary-color: #00AEEF;
+            --dark-grey: #333;
+            --medium-grey: #666;
+            --light-grey: #f4f4f4;
+            --border-color: #ddd;
+            --success-color: #28a745;
+            --premium-red: #D20000;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-grey);
+            margin: 0;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            margin-top: 0;
+        }
+        
+        h2 {
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        section {
+            background: #fff;
+            padding: 30px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        /* --- HEADER --- */
+        header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        /* --- STILE TABELLE --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        td:last-child {
+            text-align: right;
+            font-weight: 600;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: var(--light-grey);
+            font-weight: 600;
+        }
+        
+        th:last-child {
+            text-align: right;
+        }
+
+        td:first-child {
+            font-weight: 600;
+        }
+        
+        .calculator-result td:first-child {
+            font-weight: 400;
+        }
+        
+        .dynamic-row {
+            display: none; 
+            background-color: #fdfdfd;
+        }
+        .dynamic-row td:first-child {
+            padding-left: 25px;
+            font-style: italic;
+        }
+        
+        /* --- SEZIONE CONTRATTI --- */
+        .contracts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            align-items: stretch;
+        }
+        .contract-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+        .contract-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        .contract-card.premium {
+            border: 2px solid var(--premium-red);
+            transform: scale(1.05);
+            position: relative;
+        }
+         .piu-scelto-badge {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--premium-red);
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .contract-card h3 { font-size: 1.8rem; margin-top: 0; }
+        .contract-card .price { font-size: 2.8rem; font-weight: 700; margin-bottom: 5px; }
+        .contract-card .price span { font-size: 1rem; font-weight: 400; color: var(--medium-grey); }
+        .contract-card .description { color: var(--medium-grey); min-height: 60px; }
+        .contract-card .intervento { background: var(--light-grey); padding: 10px; border-radius: 5px; font-weight: 600; font-size: 0.9rem; margin: 15px 0; }
+        .features-list { list-style: none; padding: 0; text-align: left; margin: 15px 0; flex-grow: 1; }
+        .features-list li { margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px; }
+        .features-list li::before { content: ''; font-weight: 700; flex-shrink: 0; margin-top: 4px; }
+        .features-list li.included::before { content: '✔'; color: var(--success-color); }
+        .features-list li.excluded::before { content: '✖'; color: var(--premium-red); }
+        .features-list li.info::before { content: '💰'; }
+        .features-list li .feature-price { margin-left: auto; font-weight: 600; }
+        .btn { display: block; padding: 12px; border-radius: 5px; text-decoration: none; font-weight: 600; margin-top: auto; }
+        .btn-primary { background-color: var(--primary-color); color: #fff; }
+        .btn-premium { background-color: var(--premium-red); color: #fff; }
+
+
+        /* --- LAYOUT FLESSIBILE PER ESEMPI E CALCOLATORE --- */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .grid-container-calculator { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .card { background: var(--light-grey); border-left: 5px solid var(--primary-color); padding: 20px; border-radius: 5px; }
+        .card h3 { margin-top: 0; color: var(--primary-color); }
+        .card ul { padding-left: 0; list-style: none; }
+        .card li { margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .card li span:last-child { font-weight: 600; }
+        .total-line { font-weight: 700; color: var(--primary-color); border-top: 2px solid var(--dark-grey); padding-top: 10px; margin-top: 10px; }
+
+        /* --- STILE CALCOLATORE --- */
+        .calculator-form .form-group { margin-bottom: 15px; }
+        .calculator-form label { display: block; font-weight: 600; margin-bottom: 5px; }
+        .calculator-form input[type="number"], .calculator-form select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 1rem; background-color: #fff; }
+        .calculator-form .checkbox-group label { font-weight: 400; display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .calculator-result { background: var(--light-grey); padding: 20px; border-radius: 8px; height: fit-content; }
+        .calculator-result h3 { margin-top: 0; text-align: center; }
+        #total-amount { text-align: center; font-size: 2.5rem; font-weight: 700; color: var(--success-color); margin: 15px 0; }
+        
+        /* --- STILE BLOCCHI TARIFFARIO --- */
+        #tariffario h3 { margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; font-size: 1.4rem; }
+        #tariffario h3:first-of-type { margin-top: 0; border-top: none; padding-top: 0; }
+        .tariff-description { display: block; font-size: 0.8rem; font-weight: 400; color: var(--medium-grey); margin-top: 4px; }
+
+        /* --- FOOTER --- */
+        footer { text-align: center; padding: 20px; margin-top: 30px; color: var(--medium-grey); font-style: italic; }
+        
+        /* --- RESPONSIVE DESIGN --- */
+        @media (max-width: 800px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .container {
+                padding: 10px;
+            }
+            section {
+                padding: 20px 15px;
+            }
+            /* Layout a colonna singola per i contenitori principali */
+            .grid-container-calculator,
+            .contracts-container {
+                grid-template-columns: 1fr;
+            }
+            .contract-card.premium {
+                transform: none; /* Rimuove l'effetto zoom su mobile */
+            }
+             #total-amount {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Procedura Calcolo Interventi <br>TECNO CLINIC SRL</h1>
+        </header>
+
+        <main>
+            <section id="flusso">
+                <h2>1. Flusso Operativo Standard del Tecnico</h2>
+                <table>
+                    <thead><tr><th>Fase</th><th>Attività Chiave</th><th>Dettagli</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>1. Pianificazione</strong></td><td>✅ Controllo e Preparazione</td><td>Controllare appuntamenti, verificare presenza materiali e ricambi necessari.</td></tr>
+                        <tr><td><strong>2. Esecuzione</strong></td><td>🔧 Intervento e Registrazione</td><td>Eseguire la riparazione. Registrare ora di inizio/fine, km e materiali utilizzati.</td></tr>
+                        <tr><td><strong>3. Documentazione</strong></td><td>📸 Collaudo e Firma</td><td>Scattare foto "prima/dopo". Far firmare al cliente il rapportino.</td></tr>
+                        <tr><td><strong>4. Chiusura</strong></td><td>✍️ Note e Incasso</td><td>Compilare il rapportino con note chiare. Incassare il corrispettivo.</td></tr>
+                        <tr><td><strong>5. Comunicazione</strong></td><td>❗ Gestione Imprevisti</td><td>Segnalare tempestivamente alla sede ogni scostamento o imprevisto.</td></tr>
+                    </tbody>
+                </table>
+            </section>
+            
+            <section id="calcolatore">
+                <h2>2. Calcolatore Interventi Fuori Contratto</h2>
+                <div class="grid-container-calculator">
+                    <div class="calculator-form">
+                        <h3>Inserisci i dati dell'intervento</h3>
+                        <div class="form-group"><label for="tipo_manodopera">Tipo Manodopera</label><select id="tipo_manodopera"><option value="ordinaria" selected>Ordinaria (70 €/h)</option><option value="straordinaria">Straordinaria (80 €/h)</option><option value="festiva">Festiva (100 €/h)</option></select></div>
+                        <div class="form-group"><label for="ore">Ore di Manodopera</label><input type="number" id="ore" min="0" step="0.5" placeholder="Es. 2.5"></div>
+                        <div class="form-group">
+                            <label for="config_tecnici">Configurazione Tecnici</label>
+                            <select id="config_tecnici">
+                                <option value="1_senior" selected>1 Tecnico Senior</option>
+                                <option value="2_senior">2 Tecnici Senior</option>
+                                <option value="1_senior_1_junior">1 Senior + 1 Junior (supporto)</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label for="km">Distanza (km)</label><input type="number" id="km" min="0" placeholder="Es. 45"></div>
+                        <div class="form-group"><label for="ricambi">Costo Ricambi (€)</label><input type="number" id="ricambi" min="0" placeholder="Es. 50"></div>
+                        <div class="form-group"><label for="altri_costi">Altri Costi (€) <small>(Consumo, Pedaggi...)</small></label><input type="number" id="altri_costi" min="0" placeholder="Es. 15"></div>
+                        
+                        <h3>Servizi Speciali</h3>
+                        <div class="form-group"><label for="cortesia">Macchina di Cortesia</label><select id="cortesia"><option value="0" selected>Nessuna</option><option value="150">Tipologia Standard (150€)</option><option value="250">Tipologia Premium (250€)</option></select></div>
+                        <div class="checkbox-group">
+                             <label><input type="checkbox" id="urgenza"> Supplemento Urgenza "oggi per oggi" (60€)</label>
+                             <label><input type="checkbox" id="sabato"> Reperibilità Sabato (60€)</label>
+                             <label><input type="checkbox" id="festivi"> Reperibilità Domenica/Festivi (100€)</label>
+                             <label><input type="checkbox" id="fgas"> Registrazione F-GAS (25€)</label>
+                             <label><input type="checkbox" id="osmosi"> Invernaggio Osmosi (250€)</label>
+                             <label><input type="checkbox" id="assicurazione"> Gestione Pratica Assicurativa (50€)</label>
+                        </div>
+                    </div>
+
+                    <div class="calculator-result">
+                        <h3>Dettaglio Costi</h3>
+                        <table id="results-table">
+                           <tbody>
+                                <tr><td>Diritto Fisso di Chiamata</td><td id="res-diritto">0.00 €</td></tr>
+                                <tr><td>Rimborso Chilometrico</td><td id="res-km">0.00 €</td></tr>
+                                <tr><td>Manodopera (Tecnico Senior)</td><td id="res-manodopera">0.00 €</td></tr>
+                                <tr id="row-tecnico-extra" class="dynamic-row"><td>Costo Tecnico Addizionale</td><td>0.00 €</td></tr>
+                                <tr id="row-cortesia" class="dynamic-row"><td>Macchina di cortesia</td><td>0.00 €</td></tr>
+                                <tr id="row-urgenza" class="dynamic-row"><td>Supplemento Urgenza</td><td>60.00 €</td></tr>
+                                <tr id="row-sabato" class="dynamic-row"><td>Reperibilità Sabato</td><td>60.00 €</td></tr>
+                                <tr id="row-festivi" class="dynamic-row"><td>Reperibilità Festivi</td><td>100.00 €</td></tr>
+                                <tr id="row-fgas" class="dynamic-row"><td>Registrazione F-GAS</td><td>25.00 €</td></tr>
+                                <tr id="row-osmosi" class="dynamic-row"><td>Invernaggio Osmosi</td><td>250.00 €</td></tr>
+                                <tr id="row-assicurazione" class="dynamic-row"><td>Gestione Pratica Assicurativa</td><td>50.00 €</td></tr>
+                                <tr><td>Ricambi</td><td id="res-ricambi">0.00 €</td></tr>
+                                <tr><td>Altri Costi</td><td id="res-altri">0.00 €</td></tr>
+                           </tbody>
+                        </table>
+                        <h3>Importo Totale Stimato</h3>
+                        <div id="total-amount">0.00 €</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="contratti">
+                <h2>3. Piani di Assistenza Contrattuale</h2>
+                <div class="contracts-container">
+                    <div class="contract-card"><h3>BASIC</h3><div class="price">150€<span>/mese</span></div><p class="description">Assistenza tecnica essenziale per piccole attività con interventi programmati.</p><div class="intervento"><strong>Intervento:</strong> Entro 36 ore</div><ul class="features-list"><li class="included">Diritto di chiamata incluso</li><li class="excluded">Manodopera a parte</li><li class="info">Urgenza (dopo h18:00) <span class="feature-price">50€</span></li><li class="info">Reperibilità festiva <span class="feature-price">100€</span></li><li class="included">Cashback chimica 2%</li><li class="included">Attrezzatura cortesia (sconto 25%)</li><li class="included">Priorità programmazione Media</li></ul><a href="#" class="btn btn-primary">Scegli il tuo piano</a></div>
+                    <div class="contract-card premium"><div class="piu-scelto-badge">PIÙ SCELTO</div><h3>PREMIUM</h3><div class="price">300€<span>/mese</span></div><p class="description">Servizio completo con tempi di risposta rapidi e vantaggi esclusivi per la tua attività.</p><div class="intervento"><strong>Intervento:</strong> Entro 24 ore</div><ul class="features-list"><li class="included">Diritto di chiamata incluso</li><li class="excluded">Manodopera a parte</li><li class="included">Urgenza (entro 3 ore) compresa</li><li class="info">Reperibilità festiva <span class="feature-price">50€</span></li><li class="included">Cashback servizi annuale 3%</li><li class="included">Cashback chimica 3%</li><li class="included">Attrezzatura cortesia (max 1)</li><li class="included">Smaltimento ricambi compreso</li><li class="included">Priorità programmazione Alta</li><li class="included">Accesso demo illimitato</li></ul><a href="#" class="btn btn-premium">Scegli il tuo piano</a></div>
+                    <div class="contract-card"><h3>GOLD</h3><div class="price">500€<span>/mese</span></div><p class="description">Assistenza premium con massima priorità, tempi di intervento immediati e servizi VIP.</p><div class="intervento"><strong>Intervento:</strong> Entro 4-6 ore</div><ul class="features-list"><li class="included">Diritto di chiamata incluso</li><li class="included">Manodopera sempre a 70€/h</li><li class="included">Urgenza (entro 3 ore) compresa</li><li class="included">Reperibilità festiva compresa</li><li class="included">Cashback servizi annuale 5%</li><li class="included">Cashback chimica 5%</li><li class="included">Attrezzatura cortesia (max 2)</li><li class="included">Smaltimento ricambi compreso</li><li class="included">Priorità programmazione Urgente</li><li class="included">Accesso demo illimitato</li></ul><a href="#" class="btn btn-primary">Scegli il tuo piano</a></div>
+                </div>
+            </section>
+            
+            <section id="esempi">
+                <h2>4. Esempi Pratici (Fuori Contratto)</h2>
+                <div class="grid-container">
+                    <div class="card"><h3>ESEMPIO 1: Standard</h3><ul><li><span>Diritto Fisso di Chiamata</span> <span>40,00 €</span></li><li><span>Rimborso Chilometrico (35 km)</span> <span>20,00 €</span></li><li><span>Manodopera Ordinaria (2h)</span> <span>140,00 €</span></li><li><span>Ricambi Utilizzati</span> <span>50,00 €</span></li><li><span>Materiale di Consumo</span> <span>15,00 €</span></li><li class="total-line"><span><strong>TOTALE</strong></span> <span><strong>265,00 €</strong></span></li></ul></div>
+                    <div class="card"><h3>ESEMPIO 2: Urgente con F-GAS</h3><ul><li><span>Diritto Fisso di Chiamata</span> <span>40,00 €</span></li><li><span>Rimborso Chilometrico (75 km)</span> <span>30,00 €</span></li><li><span>Manodopera Ordinaria (1.5h)</span> <span>105,00 €</span></li><li><span>Supplemento Urgenza</span> <span>60,00 €</span></li><li><span>Registrazione F-GAS</span> <span>25,00 €</span></li><li><span>Ricambi (gas)</span> <span>80,00 €</span></li><li class="total-line"><span><strong>TOTALE</strong></span> <span><strong>340,00 €</strong></span></li></ul></div>
+                    <div class="card"><h3>ESEMPIO 3: Festivo Lunga Distanza</h3><ul><li><span>Diritto Fisso di Chiamata</span> <span>40,00 €</span></li><li><span>Rimborso Km (110 km)</span> <span>52,50 €</span></li><li><span>Manodopera Festiva (3h)</span> <span>300,00 €</span></li><li><span>Reperibilità Festivi</span> <span>100,00 €</span></li><li><span>Ricambi Utilizzati</span> <span>120,00 €</span></li><li><span>Pedaggi</span> <span>8,00 €</span></li><li class="total-line"><span><strong>TOTALE</strong></span> <span><strong>620,50 €</strong></span></li></ul></div>
+                </div>
+            </section>
+
+             <section id="tariffario">
+                <h2>5. Dettaglio Tariffario (Fuori Contratto)</h2>
+                
+                <h3>Manodopera e Interventi Fissi</h3>
+                <table><tbody><tr><td>Manodopera ordinaria</td><td>70,00 € / ora</td></tr><tr><td>Manodopera straordinaria</td><td>80,00 € / ora</td></tr><tr><td>Manodopera festiva</td><td>100,00 € / ora</td></tr></tbody></table>
+
+                <h3>Costi Fissi e Chilometrici</h3>
+                <table><tbody><tr><td>Diritto fisso di chiamata<span class="tariff-description">per interventi di assistenza tecnica a copertura spese generali e amministrative, gestione chiamata, gestione magazzino, preventivi ecc</span></td><td>40,00 €</td></tr><tr><td>Rimborso forfettario (entro 60 km)</td><td>20,00 €</td></tr><tr><td>Rimborso chilometrico (da 61 a 80 km)</td><td>30,00 €</td></tr><tr><td>Rimborso chilometrico (oltre 80 km)</td><td>30,00 € + 0,75 €/km eccedente</td></tr></tbody></table>
+
+                <h3>Supplementi e Reperibilità</h3>
+                <table><tbody><tr><td>Supplemento urgenza PRIORITARIA</td><td>60,00 €</td></tr><tr><td>Reperibilità al sabato</td><td>60,00 €</td></tr><tr><td>Reperibilità domenica e festivi</td><td>100,00 €</td></tr></tbody></table>
+
+                <h3>Altri Addebiti</h3>
+                <table><tbody><tr><td>Registrazione intervento su portale F-GAS</td><td>25,00 €</td></tr><tr><td>Ritiro in officina per preventivazione</td><td>80,00 €</td></tr><tr><td>Materiale di consumo</td><td>Addebito minimo 10,00 € o al costo</td></tr><tr><td>Pedaggi e Parcheggi</td><td>Al costo</td></tr></tbody></table>
+
+                <h3>Tariffe a Forfait - Mondo Caffè</h3>
+                <table><tbody><tbody><tr><td>Ritiro fino a nr. 2 apparecchi</td><td>160,00 €</td></tr><tr><td>Installazione macchina + macinacaffè + depuratore</td><td>250,00 €</td></tr><tr><td>Manutenzione ordinaria 2 Gruppi (docce, filtri, sottocoppe)</td><td>85,00 €</td></tr><tr><td>Manutenzione ordinaria 3 Gruppi (docce, filtri, sottocoppe)</td><td>95,00 €</td></tr><tr><td>Sostituzione cartuccia Brita C300</td><td>140,00 €</td></tr></tbody></table>
+            </section>
+        </main>
+
+        <footer><p>realizzato da Rossi Alessandro</p></footer>
+    </div>
+
+    <script>
+        const inputs = Array.from(document.querySelectorAll('#calcolatore input, #calcolatore select'));
+        inputs.forEach(input => input.addEventListener('input', calculateTotal));
+
+        function calculateTotal() {
+            const DIRITTO_CHIAMATA = 40;
+            const TARIFFA_JUNIOR = 50;
+            const oreInput = document.getElementById('ore');
+            const tipoManodoperaSelect = document.getElementById('tipo_manodopera');
+            const configTecniciSelect = document.getElementById('config_tecnici');
+            
+            const ore = parseFloat(oreInput.value) || 0;
+            const km = parseFloat(document.getElementById('km').value) || 0;
+            const costoRicambi = parseFloat(document.getElementById('ricambi').value) || 0;
+            const altriCosti = parseFloat(document.getElementById('altri_costi').value) || 0;
+            
+            const costoCortesia = parseFloat(document.getElementById('cortesia').value) || 0;
+            const isUrgenza = document.getElementById('urgenza').checked;
+            const isSabato = document.getElementById('sabato').checked;
+            const isFestivi = document.getElementById('festivi').checked;
+            const isFgas = document.getElementById('fgas').checked;
+            const isOsmosi = document.getElementById('osmosi').checked;
+            const isAssicurazione = document.getElementById('assicurazione').checked;
+
+            let isAnIntervention = ore > 0 || km > 0 || costoRicambi > 0 || altriCosti > 0;
+            const dirittoCosto = isAnIntervention ? DIRITTO_CHIAMATA : 0;
+            let kmCosto = 0;
+            if (km > 0 && km <= 60) kmCosto = 20;
+            else if (km > 60 && km <= 80) kmCosto = 30;
+            else if (km > 80) kmCosto = 30 + (km - 80) * 0.75;
+            
+            let baseManodoperaCosto = 0;
+            let extraTecnicoCosto = 0;
+
+            let tariffaOraria = 70;
+            const tipoManodopera = tipoManodoperaSelect.value;
+            if (tipoManodopera === 'straordinaria') tariffaOraria = 80;
+            else if (tipoManodopera === 'festiva') tariffaOraria = 100;
+            baseManodoperaCosto = ore * tariffaOraria;
+
+            const configTecnici = configTecniciSelect.value;
+            const rowExtraTecnico = document.getElementById('row-tecnico-extra');
+            if (configTecnici === '2_senior') {
+                extraTecnicoCosto = baseManodoperaCosto;
+                rowExtraTecnico.style.display = 'table-row';
+                rowExtraTecnico.querySelector('td:first-child').textContent = 'Costo 2° Tecnico Senior';
+                rowExtraTecnico.querySelector('td:last-child').textContent = `${extraTecnicoCosto.toFixed(2)} €`;
+            } else if (configTecnici === '1_senior_1_junior') {
+                extraTecnicoCosto = ore * TARIFFA_JUNIOR;
+                rowExtraTecnico.style.display = 'table-row';
+                rowExtraTecnico.querySelector('td:first-child').textContent = 'Costo Tecnico Junior';
+                rowExtraTecnico.querySelector('td:last-child').textContent = `${extraTecnicoCosto.toFixed(2)} €`;
+            } else {
+                rowExtraTecnico.style.display = 'none';
+            }
+            
+            let supplementiCosto = 0;
+            const updateRow = (id, condition, cost) => {
+                const row = document.getElementById(id);
+                row.style.display = condition ? 'table-row' : 'none';
+                if(condition) {
+                    supplementiCosto += cost;
+                    const costCell = row.querySelector('td:last-child');
+                    if(costCell) costCell.textContent = `${cost.toFixed(2)} €`;
+                }
+            };
+
+            updateRow('row-cortesia', costoCortesia > 0, costoCortesia);
+            updateRow('row-urgenza', isUrgenza, 60);
+            updateRow('row-sabato', isSabato, 60);
+            updateRow('row-festivi', isFestivi, 100);
+            updateRow('row-fgas', isFgas, 25);
+            updateRow('row-osmosi', isOsmosi, 250);
+            updateRow('row-assicurazione', isAssicurazione, 50);
+            
+            const totale = dirittoCosto + kmCosto + baseManodoperaCosto + extraTecnicoCosto + supplementiCosto + costoRicambi + altriCosti;
+
+            document.getElementById('res-diritto').textContent = `${dirittoCosto.toFixed(2)} €`;
+            document.getElementById('res-km').textContent = `${kmCosto.toFixed(2)} €`;
+            document.getElementById('res-manodopera').textContent = `${baseManodoperaCosto.toFixed(2)} €`;
+            document.getElementById('res-ricambi').textContent = `${costoRicambi.toFixed(2)} €`;
+            document.getElementById('res-altri').textContent = `${altriCosti.toFixed(2)} €`;
+            document.getElementById('total-amount').textContent = `${totale.toFixed(2)} €`;
+        }
+        calculateTotal();
+    </script>
+
+</body>
+</html>
